@@ -6,7 +6,7 @@ A full-stack platform for detecting earthquakes from raw seismometer data and tu
 into risk-scored, actionable events. Incoming station signals are screened by an STA/LTA
 trigger (the standard seismological detection algorithm); real events are scored by severity,
 stored, and published over Kafka so downstream services can react. The detection core is a
-**Spring Boot 3** backend that runs as either a single hexagonal monolith or an event-driven
+**Spring Boot** backend that runs as either a single hexagonal monolith or an event-driven
 **Spring Cloud** microservices split, and a React + MapLibre web console visualizes events on
 a live risk map.
 
@@ -158,9 +158,6 @@ Ten patterns, each applied where it earns its place:
 | **Decorator** | raw-feed conditioning pipeline | stack filters transparently |
 | **Facade** | `DisasterFacade.runMonitoringCycle()` | one entry point over many use cases |
 
-Full explanations of each, with tables and examples, live in the monolith
-[README](earthquake-monitoring/README.md).
-
 ## Quick start
 
 ### Option A: Monolith (simplest)
@@ -264,7 +261,7 @@ and Base64 URL encoding, so there is no third-party JWT dependency. Set a real s
 
 ## Tech stack
 
-**Backend:** Java 17, Spring Boot 3, Spring Cloud (Eureka, Config Server, Gateway), Spring
+**Backend:** Java, Spring Boot, Spring Cloud (Eureka, Config Server, Gateway), Spring
 Security (JWT), Spring Data JPA, Flyway, PostgreSQL, Redis, Apache Kafka, Maven.
 
 **Frontend:** React, TypeScript, Vite, MapLibre GL JS.
