@@ -6,9 +6,20 @@ Kafka (**Observer**). The same detection core ships in two deployment shapes: a 
 **hexagonal monolith** and an **event-driven microservices** split. Both are explored through
 a purpose-built **React + MapLibre** web console.
 
+<img width="1917" height="876" alt="0" src="https://github.com/user-attachments/assets/43fae95e-c7a8-4ebf-aac2-abb5718f8bf9" />
+<img width="1917" height="906" alt="000" src="https://github.com/user-attachments/assets/9c8f78f5-7068-4f42-9dec-01934ced69b7" />
+<img width="1917" height="905" alt="100" src="https://github.com/user-attachments/assets/fc0732da-7f55-43ff-9e78-f3197166ceb6" />
+
 The codebase is organized around clean architectural seams and ten classic design patterns
 (Strategy, Factory, Adapter, Observer, Builder, Template Method, Chain of Responsibility,
 Command, Decorator, Facade), following SOLID.
+
+#Screenshots
+<img width="1917" height="902" alt="001" src="https://github.com/user-attachments/assets/df7995b3-bc7b-4288-b040-9f956791da10" />
+<img width="830" height="557" alt="011" src="https://github.com/user-attachments/assets/a37ed17f-fa76-4683-a4c6-fec88ad5ff8f" />
+<img width="1912" height="900" alt="101" src="https://github.com/user-attachments/assets/f483ffbe-464c-4ee2-a095-53a302a37490" />
+<img width="1912" height="892" alt="010" src="https://github.com/user-attachments/assets/ad9ef243-aea6-41ba-86ba-18317d87c957" />
+<img width="891" height="600" alt="110" src="https://github.com/user-attachments/assets/40fc222c-b0dc-4821-8171-bc93fe5371bf" />
 
 ## Repository layout
 
@@ -30,15 +41,16 @@ CI runs build and tests on every push (`.github/workflows/ci.yml` in each backen
 1. **Ingest:** pulls seismic events from external feeds (AFAD, Kandilli, USGS) through
    pluggable **Adapters**, layered with **Decorators** for deduplication, minimum-magnitude
    filtering, and depth defaulting.
-2. **Detect:** runs raw signal windows through an **STA/LTA** detector to decide whether an
+3. **Detect:** runs raw signal windows through an **STA/LTA** detector to decide whether an
    event is real, then estimates magnitude from peak amplitude.
-3. **Score and assess:** assigns a risk level (LOW, MEDIUM, HIGH, CRITICAL) via swappable
+4. **Score and assess:** assigns a risk level (LOW, MEDIUM, HIGH, CRITICAL) via swappable
    scoring **Strategies**, and assesses non-earthquake disasters (flood, wildfire) via a
    **Factory** of handlers.
-4. **React:** publishes an `earthquake.detected` event on Kafka; downstream **Observers**
-   raise alerts (**Command** with retry and undo), update running statistics, and flag users
-   in affected regions.
-5. **Explore:** the web console visualizes events on a risk-colored MapLibre map, draws a
+5. **React:** publishes an `earthquake.detected` event on Kafka; downstream **Observers**
+   raise alerts (**Command** with retry and undo) and update running statistics. A
+   user-region consumer receives the same events as the seam for region-based user
+   notification.
+6. **Explore:** the web console visualizes events on a risk-colored MapLibre map, draws a
    live seismograph trace for detection, and renders text or Markdown reports.
 
 ## Architecture (Ports & Adapters)
