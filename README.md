@@ -1,10 +1,14 @@
 # Earthquake & Disaster Monitoring Platform
 
-A full-stack seismic monitoring system. Raw station signals are run through an **STA/LTA
-detector**; detected events are risk-scored (**Strategy**), persisted, and fanned out over
-Kafka (**Observer**). The same detection core ships in two deployment shapes: a clean
-**hexagonal monolith** and an **event-driven microservices** split. Both are explored through
-a purpose-built **React + MapLibre** web console.
+**Spring Boot 3 · Spring Cloud · Apache Kafka · PostgreSQL · Redis · React + TypeScript**
+
+A full-stack platform for detecting earthquakes from raw seismometer data and turning them
+into risk-scored, actionable events. Incoming station signals are screened by an STA/LTA
+trigger (the standard seismological detection algorithm); real events are scored by severity,
+stored, and published over Kafka so downstream services can react. The detection core is a
+**Spring Boot 3** backend that runs as either a single hexagonal monolith or an event-driven
+**Spring Cloud** microservices split, and a React + MapLibre web console visualizes events on
+a live risk map.
 
 <img width="1917" height="876" alt="0" src="https://github.com/user-attachments/assets/43fae95e-c7a8-4ebf-aac2-abb5718f8bf9" />
 <img width="1917" height="906" alt="000" src="https://github.com/user-attachments/assets/9c8f78f5-7068-4f42-9dec-01934ced69b7" />
