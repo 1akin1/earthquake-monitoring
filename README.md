@@ -14,13 +14,6 @@ The codebase is organized around clean architectural seams and ten classic desig
 (Strategy, Factory, Adapter, Observer, Builder, Template Method, Chain of Responsibility,
 Command, Decorator, Facade), following SOLID.
 
-#Screenshots
-<img width="1917" height="902" alt="001" src="https://github.com/user-attachments/assets/df7995b3-bc7b-4288-b040-9f956791da10" />
-<img width="830" height="557" alt="011" src="https://github.com/user-attachments/assets/a37ed17f-fa76-4683-a4c6-fec88ad5ff8f" />
-<img width="1912" height="900" alt="101" src="https://github.com/user-attachments/assets/f483ffbe-464c-4ee2-a095-53a302a37490" />
-<img width="1912" height="892" alt="010" src="https://github.com/user-attachments/assets/ad9ef243-aea6-41ba-86ba-18317d87c957" />
-<img width="891" height="600" alt="110" src="https://github.com/user-attachments/assets/40fc222c-b0dc-4821-8171-bc93fe5371bf" />
-
 ## Repository layout
 
 This is a monorepo with three independent projects, each with its own detailed README:
@@ -52,6 +45,13 @@ CI runs build and tests on every push (`.github/workflows/ci.yml` in each backen
    notification.
 6. **Explore:** the web console visualizes events on a risk-colored MapLibre map, draws a
    live seismograph trace for detection, and renders text or Markdown reports.
+
+#Screenshots
+<img width="1917" height="902" alt="001" src="https://github.com/user-attachments/assets/df7995b3-bc7b-4288-b040-9f956791da10" />
+<img width="1912" height="900" alt="101" src="https://github.com/user-attachments/assets/f483ffbe-464c-4ee2-a095-53a302a37490" />
+<img width="1912" height="892" alt="010" src="https://github.com/user-attachments/assets/ad9ef243-aea6-41ba-86ba-18317d87c957" />
+<img width="830" height="557" alt="011" src="https://github.com/user-attachments/assets/a37ed17f-fa76-4683-a4c6-fec88ad5ff8f" />
+<img width="891" height="600" alt="110" src="https://github.com/user-attachments/assets/40fc222c-b0dc-4821-8171-bc93fe5371bf" />
 
 ## Architecture (Ports & Adapters)
 
