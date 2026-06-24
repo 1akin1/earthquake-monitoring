@@ -1,0 +1,133 @@
+# Phase 2 — the whole platform in one stack.
+# Infra (postgres/redis/kafka) + discovery + config + gateway + the 3 consumer services
+# + the detection-service (the former monolith, built from the sibling repo).
+#
+# Kafka has two listeners: INTERNAL (kafka:19092) for in-network services, and HOST
+# (localhost:9092) so the monolith can still be run on the host during development.
+services:
+  postgres:
+    image: postgres:16
+    container_name: eq-postgres
+    environment:
+      POSTGRES_DB: earthquake
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post123
+    ports: ["5432:5432"]
+    volumes: ["eq_pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d earthquake"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: eq-redis
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: apache/kafka:3.8.0
+    container_name: eq-kafka
+    ports: ["9092:9092"]
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:19092,HOST://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:19092,HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  discovery:
+    build: { context: ., dockerfile: eq-discovery/Dockerfile }
+    container_name: eq-discovery
+    ports: ["8761:8761"]
+
+  config-server:
+    build: { context: ., dockerfile: eq-config-server/Dockerfile }
+    container_name: eq-config-server
+    ports: ["8888:8888"]
+    depends_on: [discovery]
+
+  gateway:
+    build: { context: ., dockerfile: eq-gateway/Dockerfile }
+    container_name: eq-gateway
+    ports: ["8080:8080"]
+    environment:
+      EUREKA_URL: http://discovery:8761/eureka
+    depends_on: [discovery]
+
+  alert-service:
+    build: { context: ., dockerfile: eq-alert-service/Dockerfile }
+    container_name: eq-alert-service
+    environment:
+      KAFKA_BOOTSTRAP: kafka:19092
+      EUREKA_URL: http://discovery:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+    depends_on:
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_started }
+      config-server: { condition: service_started }
+
+  report-service:
+    build: { context: ., dockerfile: eq-report-service/Dockerfile }
+    container_name: eq-report-service
+    ports: ["8092:8092"]
+    environment:
+      KAFKA_BOOTSTRAP: kafka:19092
+      EUREKA_URL: http://discovery:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+    depends_on:
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_started }
+      config-server: { condition: service_started }
+
+  user-service:
+    build: { context: ., dockerfile: eq-user-service/Dockerfile }
+    container_name: eq-user-service
+    environment:
+      KAFKA_BOOTSTRAP: kafka:19092
+      EUREKA_URL: http://discovery:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+    depends_on:
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_started }
+      config-server: { condition: service_started }
+
+  # The former monolith, now the producer/core. Built from the sibling repo; it registers
+  # with Eureka and publishes to kafka:19092. See MICROSERVICES.md for the small migration.
+  detection-service:
+    build: { context: ../earthquake-monitoring }
+    container_name: eq-detection-service
+    ports: ["8081:8081"]
+    environment:
+      SPRING_PROFILES_ACTIVE: platform
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/earthquake
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+      EUREKA_URL: http://discovery:8761/eureka
+      CONFIG_SERVER_URL: http://config-server:8888
+      JWT_SECRET: change-me-in-prod-please-32-characters-min
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      discovery: { condition: service_started }
+
+volumes:
+  eq_pgdata:

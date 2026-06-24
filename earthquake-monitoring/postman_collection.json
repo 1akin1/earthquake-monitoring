@@ -1,0 +1,356 @@
+{
+  "info": {
+    "name": "Earthquake & Disaster Monitoring API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"scientist\",\n  \"password\": \"science123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('token', json.token);",
+              "pm.test('got a token', () => pm.expect(json.token).to.be.a('string'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Analyze signal",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/detection/analyze",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "detection",
+            "analyze"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"stationId\": \"STA-YLV\",\n  \"latitude\": 40.65,\n  \"longitude\": 29.27,\n  \"sampleRateHz\": 100.0,\n  \"startTime\": \"2026-06-21T08:00:00Z\",\n  \"amplitudes\": [\n    0.0,\n    2.58,\n    3.94,\n    3.45,\n    1.34,\n    -1.4,\n    -3.49,\n    -3.93,\n    -2.53,\n    0.07,\n    2.63,\n    3.95,\n    3.42,\n    1.28,\n    -1.47,\n    -3.52,\n    -3.92,\n    -2.47,\n    0.13,\n    2.68,\n    3.96,\n    3.38,\n    1.21,\n    -1.53,\n    -3.55,\n    -3.9,\n    -2.42,\n    0.2,\n    2.73,\n    3.97,\n    3.35,\n    1.15,\n    -1.59,\n    -3.58,\n    -3.89,\n    -2.37,\n    0.27,\n    2.78,\n    3.98,\n    3.31,\n    1.08,\n    -1.65,\n    -3.61,\n    -3.87,\n    -2.31,\n    0.34,\n    2.82,\n    3.98,\n    3.27,\n    1.02,\n    -1.71,\n    -3.64,\n    -3.85,\n    -2.26,\n    0.4,\n    2.87,\n    3.99,\n    3.23,\n    0.95,\n    -1.77,\n    -3.67,\n    -3.83,\n    -2.2,\n    0.47,\n    2.92,\n    3.99,\n    3.19,\n    0.89,\n    -1.83,\n    -3.69,\n    -3.82,\n    -2.14,\n    0.54,\n    2.96,\n    4.0,\n    3.15,\n    0.82,\n    -1.89,\n    -3.72,\n    -3.79,\n    -2.09,\n    0.6,\n    3.01,\n    4.0,\n    3.11,\n    0.76,\n    -1.95,\n    -3.74,\n    -3.77,\n    -2.03,\n    0.0,\n    576.56,\n    659.48,\n    266.28,\n    -253.66,\n    -515.54,\n    -374.96,\n    7.51,\n    325.99,\n    366.51,\n    143.28,\n    -146.36,\n    -288.69,\n    -206.32,\n    8.38,\n    184.23,\n    203.64,\n    76.97,\n    -84.33,\n    -161.61,\n    -113.47,\n    7.01,\n    104.07,\n    113.11,\n    41.28,\n    -48.53,\n    -90.45,\n    -62.38,\n    5.21,\n    58.77\n  ]\n}"
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. List earthquakes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/earthquakes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "earthquakes"
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Create earthquake",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/earthquakes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "earthquakes"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"magnitude\": 6.4,\n  \"depthKm\": 12.0,\n  \"latitude\": 40.7,\n  \"longitude\": 29.1,\n  \"source\": \"MANUAL\",\n  \"occurredAt\": \"2026-06-21T08:05:00Z\"\n}"
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Summary report",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/reports",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reports"
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. Rendered report (markdown)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/reports/render?format=markdown",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reports",
+            "render"
+          ],
+          "query": [
+            {
+              "key": "format",
+              "value": "markdown"
+            }
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. Assess disaster",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/disasters/assess",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "disasters",
+            "assess"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"EARTHQUAKE\",\n  \"intensity\": 7.2\n}"
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. Monitoring cycle (Facade)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/monitoring/cycle",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "monitoring",
+            "cycle"
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "9. Stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/stats",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "stats"
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "10. Delete earthquake (ADMIN)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/earthquakes/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "earthquakes",
+            "1"
+          ]
+        },
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "11. Health (public)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "actuator",
+            "health"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

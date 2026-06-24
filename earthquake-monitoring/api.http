@@ -1,0 +1,81 @@
+### Earthquake & Disaster Monitoring API — REST client requests
+### VS Code "REST Client" / IntelliJ HTTP Client. Run requests top-down.
+@host = http://localhost:8081
+
+### 1) Log in (demo accounts: admin/admin123, scientist/science123, viewer/viewer123)
+# The response script stores the JWT in {{token}} for the requests below.
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "scientist",
+  "password": "science123"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+### 2) Analyze a raw signal window (SCIENTIST or ADMIN). 120 samples — enough for STA/LTA.
+POST {{host}}/api/detection/analyze
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "stationId": "STA-YLV",
+  "latitude": 40.65,
+  "longitude": 29.27,
+  "sampleRateHz": 100.0,
+  "startTime": "2026-06-21T08:00:00Z",
+  "amplitudes": [0.0, 2.58, 3.94, 3.45, 1.34, -1.4, -3.49, -3.93, -2.53, 0.07, 2.63, 3.95, 3.42, 1.28, -1.47, -3.52, -3.92, -2.47, 0.13, 2.68, 3.96, 3.38, 1.21, -1.53, -3.55, -3.9, -2.42, 0.2, 2.73, 3.97, 3.35, 1.15, -1.59, -3.58, -3.89, -2.37, 0.27, 2.78, 3.98, 3.31, 1.08, -1.65, -3.61, -3.87, -2.31, 0.34, 2.82, 3.98, 3.27, 1.02, -1.71, -3.64, -3.85, -2.26, 0.4, 2.87, 3.99, 3.23, 0.95, -1.77, -3.67, -3.83, -2.2, 0.47, 2.92, 3.99, 3.19, 0.89, -1.83, -3.69, -3.82, -2.14, 0.54, 2.96, 4.0, 3.15, 0.82, -1.89, -3.72, -3.79, -2.09, 0.6, 3.01, 4.0, 3.11, 0.76, -1.95, -3.74, -3.77, -2.03, 0.0, 576.56, 659.48, 266.28, -253.66, -515.54, -374.96, 7.51, 325.99, 366.51, 143.28, -146.36, -288.69, -206.32, 8.38, 184.23, 203.64, 76.97, -84.33, -161.61, -113.47, 7.01, 104.07, 113.11, 41.28, -48.53, -90.45, -62.38, 5.21, 58.77]
+}
+
+### 3) List earthquakes (any authenticated role)
+GET {{host}}/api/earthquakes
+Authorization: Bearer {{token}}
+
+### 4) Create an earthquake manually (SCIENTIST or ADMIN)
+POST {{host}}/api/earthquakes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "magnitude": 6.4,
+  "depthKm": 12.0,
+  "latitude": 40.7,
+  "longitude": 29.1,
+  "source": "MANUAL",
+  "occurredAt": "2026-06-21T08:05:00Z"
+}
+
+### 5) Summary report (any authenticated role)
+GET {{host}}/api/reports
+Authorization: Bearer {{token}}
+
+### 6) Rendered report — markdown (Template Method)
+GET {{host}}/api/reports/render?format=markdown
+Authorization: Bearer {{token}}
+
+### 7) Assess a disaster reading (SCIENTIST or ADMIN)
+POST {{host}}/api/disasters/assess
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "type": "EARTHQUAKE",
+  "intensity": 7.2
+}
+
+### 8) Run a full monitoring cycle — import then summarise (Facade)
+POST {{host}}/api/monitoring/cycle
+Authorization: Bearer {{token}}
+
+### 9) Stats
+GET {{host}}/api/stats
+Authorization: Bearer {{token}}
+
+### 10) Delete an earthquake (ADMIN only — log in as admin/admin123 first)
+DELETE {{host}}/api/earthquakes/1
+Authorization: Bearer {{token}}
+
+### 11) Health (public)
+GET {{host}}/actuator/health

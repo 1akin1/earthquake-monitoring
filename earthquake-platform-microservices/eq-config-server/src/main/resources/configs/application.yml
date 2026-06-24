@@ -1,0 +1,7 @@
+# Shared defaults served to every service that imports the config server.
+# (Per-service files like alert-service.yml would override these.)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics

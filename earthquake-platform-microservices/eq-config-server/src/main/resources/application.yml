@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native           # demo: serve config from the classpath instead of a git repo
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/configs
+server:
+  port: 8888

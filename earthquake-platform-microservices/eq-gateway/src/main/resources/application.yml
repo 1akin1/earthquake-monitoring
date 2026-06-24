@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true            # also expose lb://<service-id> automatically
+          lower-case-service-id: true
+      routes:
+        # Core REST API + auth -> the detection-service (the former monolith).
+        - id: detection-service
+          uri: lb://detection-service
+          predicates:
+            - Path=/api/auth/**,/api/earthquakes/**,/api/reports/**,/api/detection/**,/api/disasters/**,/api/stats/**,/api/feeds/**,/api/monitoring/**
+        # Report statistics maintained by the report consumer.
+        - id: report-service
+          uri: lb://report-service
+          predicates:
+            - Path=/api/report-stats/**
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, gateway
